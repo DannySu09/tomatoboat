@@ -1,6 +1,9 @@
 use std::fs;
 use directories::ProjectDirs;
 use diesel::prelude::*;
+use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
+
+const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
 pub fn conn_db() -> SqliteConnection {
   let proj_dir = ProjectDirs::from("com", "naiwensu", "tomatoboat").unwrap();
@@ -21,5 +24,10 @@ pub fn conn_db() -> SqliteConnection {
     .unwrap_or_else(|_e| {
       panic!("Error connecting to {}", proj_db_path_str)
     })
+}
+
+pub fn run_migrations() {
+  let mut conn = conn_db();
+  conn.run_pending_migrations(MIGRATIONS).unwrap();
 }
 

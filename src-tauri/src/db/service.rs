@@ -1,14 +1,18 @@
 use diesel::prelude::*;
-use crate::models::{Topic, NewTopic};
+use super::models::{Topic, NewTopic};
 
-pub fn get_all_topics(conn: &mut SqliteConnection) -> Vec<Topic> {
-  use crate::schema::topic::dsl::*;
+pub fn get_recent_topics(conn: &mut SqliteConnection) -> Vec<Topic> {
+  use super::schema::topic::dsl::*;
 
-  topic.limit(5).load::<Topic>(conn).expect("Error loading topics")
+  topic
+    .limit(5)
+    .order(created_at.desc())
+    .load::<Topic>(conn)
+    .expect("Error loading topics")
 }
 
 pub fn create_topic(conn: &mut SqliteConnection, title: &str, desc: &str) -> Topic {
-  use crate::schema::topic;
+  use super::schema::topic;
 
   let new_topic = NewTopic { title, desc };
   diesel::insert_into(topic::table)
