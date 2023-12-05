@@ -10,7 +10,7 @@ function createTopic(evt: Event) {
   evt.stopPropagation();
 
   invoke('create_topic', {
-    invokeMessage: JSON.stringify({
+    msg: JSON.stringify({
       title: title.value,
       desc: desc.value
     })

@@ -20,7 +20,6 @@ fn get_topics() -> String {
 #[tauri::command]
 fn create_topic(msg: String) -> String {
     let mut conn = db::connect::conn_db();
-    println!("{}", &msg);
     let payload = serde_json::from_str::<db::models::NewTopic>(&msg).expect("Failed to parse json into Payload");
     let new_topic = db::service::create_topic(&mut conn, payload.title, payload.desc);
     let new_topic_str = serde_json::to_string(&new_topic).expect("Failed to creating json string");

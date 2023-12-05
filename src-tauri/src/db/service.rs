@@ -19,5 +19,5 @@ pub fn create_topic(conn: &mut SqliteConnection, title: &str, desc: &str) -> Top
     .values(&new_topic)
     .returning(Topic::as_returning())
     .get_result(conn)
-    .expect("test")
+    .expect("Failed to create new topic.")
 }
