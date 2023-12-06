@@ -1,5 +1,6 @@
 use super::schema;
 use diesel::prelude::*;
+use time::PrimitiveDateTime;
 
 #[derive(Queryable, Selectable)]
 #[derive(Clone, serde::Serialize)]
@@ -8,9 +9,9 @@ use diesel::prelude::*;
 pub struct Topic {
     pub id: i32,
     pub title: String,
-    pub desc: String,
-    pub created_at: i32,
-    pub modified_at: i32,
+    pub desc: Option<String>,
+    pub created_at: PrimitiveDateTime,
+    pub modified_at: Option<PrimitiveDateTime>,
 }
 
 #[derive(Insertable)]
@@ -19,6 +20,7 @@ pub struct Topic {
 pub struct NewTopic<'a> {
   pub title: &'a str,
   pub desc: &'a str,
+  pub created_at: PrimitiveDateTime,
 }
 
 #[derive(Queryable, Selectable)]
@@ -29,8 +31,8 @@ pub struct Event {
   pub id: i32,
   pub title: String,
   pub topic_id: i32,
-  pub began_at: i32,
-  pub ended_at: i32,
+  pub began_at: Date,
+  pub ended_at: Date,
 }
 
 #[derive(Queryable, Selectable)]
@@ -40,7 +42,7 @@ pub struct Event {
 pub struct Work {
   pub id: i32,
   pub event_id: i32,
-  pub began_at: i32,
-  pub ended_at: i32,
+  pub began_at: Date,
+  pub ended_at: Date,
   pub desc: String
 }
