@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import Greet from "./components/Greet.vue";
-import CreateTopic from "./components/CreateTopic.vue";
 
 </script>
 
 <template>
-  <div class="container">
+  <div class="container font-sans h-full w-full bg-gray-100 p-8">
     <Greet />
-    <CreateTopic />
   </div>
 </template>

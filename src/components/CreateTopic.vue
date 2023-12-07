@@ -1,19 +1,17 @@
  <script setup lang="ts">
 import { ref } from "vue";
-import { invoke } from "@tauri-apps/api/tauri";
+import { createTopic } from '../db';
 
 const title = ref('');
 const desc = ref('');
 
-function createTopic(evt: Event) {
+function handleCreateBtnClick(evt: Event) {
   evt.preventDefault();
   evt.stopPropagation();
 
-  invoke('create_topic', {
-    msg: JSON.stringify({
-      title: title.value,
-      desc: desc.value
-    })
+  createTopic({
+    title: title.value,
+    desc: desc.value
   });
 }
 
@@ -23,6 +21,6 @@ function createTopic(evt: Event) {
   <div>
     <input name="title" type="text" placeholder="title" v-model="title">
     <textarea name="desc" cols="30" rows="10" v-model="desc"></textarea>
-    <button @click="createTopic">+ New Topic</button>
+    <button @click="handleCreateBtnClick">+ New Topic</button>
   </div>
 </template>

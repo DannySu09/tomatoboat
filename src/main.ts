@@ -1,4 +1,10 @@
 import { createApp } from "vue";
 import App from "./App.vue";
+import './styles.css';
+import 'virtual:uno.css';
 
-createApp(App).mount("#app");
+import { init } from './db';
+
+init(() => {
+  createApp(App).mount("#app");
+});
