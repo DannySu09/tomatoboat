@@ -23,7 +23,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.tauri.dev",
+      "identifier": "com.naiwensu.tomatoboat",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
@@ -38,10 +38,11 @@
     "windows": [
       {
         "fullscreen": false,
-        "resizable": true,
-        "title": "tomatoboat",
-        "width": 800,
-        "height": 600
+        "resizable": false,
+        "title": "",
+        "width": 768,
+        "height": 500,
+        "titleBarStyle": "Transparent"
       }
     ]
   }

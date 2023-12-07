@@ -1,4 +1,30 @@
 import { createApp } from "vue";
-import App from "./App.vue";
+import { createRouter, createMemoryHistory } from 'vue-router';
 
-createApp(App).mount("#app");
+import Root from './Root.vue';
+import Home from './pages/Home.vue';
+import Topic from './pages/Topic.vue';
+
+import '@unocss/reset/tailwind-compat.css';
+import './styles.css';
+import 'virtual:uno.css';
+
+import { initDb } from './db';
+
+const routes = [
+  { path: '/', component: Home },
+  { path: '/:topicId', component: Topic },
+];
+
+const router = createRouter({
+  history: createMemoryHistory(),
+  routes
+});
+
+const app = createApp(Root);
+
+app.use(router);
+
+initDb(() => {
+  app.mount("#app");
+});
