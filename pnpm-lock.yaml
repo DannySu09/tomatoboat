@@ -8,17 +8,29 @@ dependencies:
   '@tauri-apps/api':
     specifier: ^1.5.1
     version: 1.5.1
+  '@unocss/reset':
+    specifier: ^0.58.0
+    version: 0.58.0
   tauri-plugin-sql-api:
     specifier: github:tauri-apps/tauri-plugin-sql#v1
-    version: git@github.com+tauri-apps/tauri-plugin-sql/cf80d013a6ea34ee3ca74e4968a1632e87ba0de2
+    version: github.com/tauri-apps/tauri-plugin-sql/cf80d013a6ea34ee3ca74e4968a1632e87ba0de2
   vue:
     specifier: ^3.3.4
     version: 3.3.4
+  vue-router:
+    specifier: '4'
+    version: 4.2.5(vue@3.3.4)
 
 devDependencies:
+  '@iconify-json/solar':
+    specifier: ^1.1.8
+    version: 1.1.8
   '@tauri-apps/cli':
     specifier: ^1.5.6
     version: 1.5.6
+  '@unocss/preset-icons':
+    specifier: ^0.58.0
+    version: 0.58.0
   '@unocss/preset-wind':
     specifier: ^0.58.0
     version: 0.58.0
@@ -583,6 +595,12 @@ packages:
     dev: true
     optional: true
 
+  /@iconify-json/solar@1.1.8:
+    resolution: {integrity: sha512-w9khWcUWSydMci7V4wTsHof8tz/S2hJeXj+PbnI/Ic/47BpQKGrLYV7W5+oMKIONUmj5VrBBtctpy8o1rL9JHw==}
+    dependencies:
+      '@iconify/types': 2.0.0
+    dev: true
+
   /@iconify/types@2.0.0:
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
     dev: true
@@ -927,7 +945,6 @@ packages:
 
   /@unocss/reset@0.58.0:
     resolution: {integrity: sha512-UVZ5kz37JGbwAA06k/gjKYcekcTwi6oIhev1EpTtCvHLL6XYcYqcwb/u4Wjzprd3L3lxDGYXvGdjREGm2u7vbQ==}
-    dev: true
 
   /@unocss/rule-utils@0.58.0:
     resolution: {integrity: sha512-LBJ9dJ/j5UIMzJF7pmIig55MtJAYtG+tn/zQRveZuPRVahzP+KqwlyB7u3uCUnQhdgo/MJODMcqyr0jl6+kTuA==}
@@ -1076,6 +1093,10 @@ packages:
     dependencies:
       '@vue/compiler-dom': 3.3.4
       '@vue/shared': 3.3.4
+
+  /@vue/devtools-api@6.5.1:
+    resolution: {integrity: sha512-+KpckaAQyfbvshdDW5xQylLni1asvNSGme1JFs8I1+/H5pHEhqUKMEQD/qn3Nx5+/nycBq11qAEi8lk+LXI2dA==}
+    dev: false
 
   /@vue/language-core@1.8.5(typescript@5.0.2):
     resolution: {integrity: sha512-DKQNiNQzNV7nrkZQujvjfX73zqKdj2+KoM4YeKl+ft3f+crO3JB4ycPnmgaRMNX/ULJootdQPGHKFRl5cXxwaw==}
@@ -1906,6 +1927,15 @@ packages:
       fsevents: 2.3.3
     dev: true
 
+  /vue-router@4.2.5(vue@3.3.4):
+    resolution: {integrity: sha512-DIUpKcyg4+PTQKfFPX88UWhlagBEBEfJ5A8XDXRJLUnZOvcpMF8o/dnL90vpVkGaPbjvXazV/rC1qBKrZlFugw==}
+    peerDependencies:
+      vue: ^3.2.0
+    dependencies:
+      '@vue/devtools-api': 6.5.1
+      vue: 3.3.4
+    dev: false
+
   /vue-template-compiler@2.7.15:
     resolution: {integrity: sha512-yQxjxMptBL7UAog00O8sANud99C6wJF+7kgbcwqkvA38vCGF7HWE66w0ZFnS/kX5gSoJr/PQ4/oS3Ne2pW37Og==}
     dependencies:
@@ -1955,8 +1985,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  git@github.com+tauri-apps/tauri-plugin-sql/cf80d013a6ea34ee3ca74e4968a1632e87ba0de2:
-    resolution: {commit: cf80d013a6ea34ee3ca74e4968a1632e87ba0de2, repo: git@github.com:tauri-apps/tauri-plugin-sql.git, type: git}
+  github.com/tauri-apps/tauri-plugin-sql/cf80d013a6ea34ee3ca74e4968a1632e87ba0de2:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-sql/tar.gz/cf80d013a6ea34ee3ca74e4968a1632e87ba0de2}
     name: tauri-plugin-sql-api
     version: 0.0.0
     dependencies:

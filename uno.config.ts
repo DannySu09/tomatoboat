@@ -1,5 +1,6 @@
-import { defineConfig } from 'unocss'
-import presetWind from '@unocss/preset-wind'
+import { defineConfig } from 'unocss';
+import presetWind from '@unocss/preset-wind';
+import presetIcons from '@unocss/preset-icons';
 
 export default defineConfig({
   theme: {
@@ -25,8 +26,8 @@ export default defineConfig({
         800: '#032851'
       },
       gray: {
-        100: '#F2F1F5',
-        200: '#C5C4C8',
+        100: '#FCFBF8',
+        200: '#E5E9EB',
         300: '#AAABAF',
         400: '#B1BCC6',
         500: '#6C7D89',
@@ -48,5 +49,10 @@ export default defineConfig({
   },
   presets: [
     presetWind(),
+    presetIcons({
+      collections: {
+        solar: () => import('@iconify-json/solar/icons.json').then(i => i.default as any)
+      }
+    }),
   ],
 });

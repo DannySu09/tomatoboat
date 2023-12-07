@@ -38,10 +38,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "resizable": true,
-        "title": null,
-        "width": 800,
-        "height": 600,
+        "resizable": false,
+        "title": "",
+        "width": 768,
+        "height": 500,
         "titleBarStyle": "Transparent"
       }
     ]
