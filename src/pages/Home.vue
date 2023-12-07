@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import CreateTopic from "../components/CreateTopic.vue";
-import TopicEntry from "../components/base/TopicEntry.vue";
+import TopicEntry from "../components/TopicEntry.vue";
 
 import { getRecentTopics } from "../db";
 import type { Topic } from "../db/types";
@@ -18,13 +18,17 @@ onMounted(handleMounted)
 
 <template>
   <div class="container font-sans h-full w-full bg-pink-100 p-8">
-    <TopicEntry v-for="topic in recentTopics" role="button" :topic="topic" class-name="w-full" />
-    <CreateTopic :on-topic-created="handleMounted">
-      <i
-        role="button"
-        class="fixed bottom-10 right-6 i-solar:add-square-bold inline-block w-12 h-12 text-blue-400 hover:text-pink-700 hover:rotate-90 transition" />
-    </CreateTopic>
+    <TopicEntry
+      v-for="topic in recentTopics"
+      :topic="topic"
+      role="button"
+      class-name="w-full" />
   </div>
+  <CreateTopic :on-topic-created="handleMounted">
+    <i
+      role="button"
+      class="fixed bottom-10 right-6 i-solar:add-square-bold inline-block w-12 h-12 text-blue-400 hover:text-pink-700 hover:rotate-90 transition" />
+  </CreateTopic>
 </template>
 
 <style scoped>
