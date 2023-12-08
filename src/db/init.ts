@@ -20,6 +20,7 @@ export function createTableEvent(db: Database) {
 CREATE TABLE event (
   id VARCHAR PRIMARY KEY,
   title TEXT NOT NULL,
+  topic_id VARCHAR,
   began_at DATETIME NOT NULL,
   ended_at DATETIME
 );

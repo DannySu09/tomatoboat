@@ -1,9 +1,11 @@
 import { createApp } from "vue";
-import { createRouter, createMemoryHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 
 import Root from './Root.vue';
 import Home from './pages/Home.vue';
 import Topic from './pages/Topic.vue';
+
+import routes from './routes';
 
 import '@unocss/reset/tailwind-compat.css';
 import './styles.css';
@@ -11,14 +13,12 @@ import 'virtual:uno.css';
 
 import { initDb } from './db';
 
-const routes = [
-  { path: '/', component: Home },
-  { path: '/:topicId', component: Topic },
-];
-
 const router = createRouter({
-  history: createMemoryHistory(),
-  routes
+  history: createWebHistory(),
+  routes: [
+    { path: routes.home, component: Home },
+    { name: 'topic', path: routes.topic, component: Topic },
+  ]
 });
 
 const app = createApp(Root);

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-import Card from './base/Card.vue';
-import type { Topic } from '../db/types';
+import Card from '../base/Card.vue';
+import type { Topic } from '../../db/types';
 
 type Props = {
   topic: Topic;
@@ -11,6 +11,7 @@ type Props = {
 }
 
 type Events = {
+  (e: 'click:card', payload: Topic): void;
   (e: 'click:btn:start', payload: Topic): void;
   (e: 'click:btn:delete', payload: Topic): void;
 }
@@ -24,7 +25,7 @@ const emit = defineEmits<Events>();
 <template>
   <Card
     role="button"
-    @click=""
+    @click="emit('click:card', topic)"
     :class-name="className"
     :title-class-name="titleClassName">
     <template #title>

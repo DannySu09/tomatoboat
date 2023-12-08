@@ -72,8 +72,7 @@ const isTitleValid = computed(() => {
       <button
         class="flex justify-center items-center p-2 rounded-lg w-1/2 h-13 bg-blue-500 transition text-gray-100 hover:bg-pink-700 disabled:bg-gray-200"
         :disabled="isTitleValid" @click="handleCreateBtnClick">
-        <i class="i-solar:add-circle-bold inline-block text-2xl mr-2" />
-        New Topic
+        Ok
       </button>
 
     </template>

@@ -39,3 +39,12 @@ export async function createTopic(topic: NewTopic) {
   const newId = await invoke("get_uuid");
   return globalDb.execute("insert into topic (id, title, desc, created_at) values ($1, $2, $3, $4)", [newId, topic.title, topic.desc, (new Date()).toISOString()]);
 }
+
+export function getTopic(id: string) {
+  return globalDb.select("select * from topic where id = $1", [id]);
+}
+
+// event
+export function getEvents(topicId: string) {
+  return globalDb.select("select * from event where topic_id=$1", [topicId]);
+}
