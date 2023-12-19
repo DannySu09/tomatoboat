@@ -6,9 +6,11 @@ import Button from '../components/base/Button.vue';
 import Icon from '../components/base/Icon.vue';
 import Modal from '../components/base/Modal.vue';
 
+import Timer from '../components/Timer/index.vue';
+
 import routes from '../routes';
 import * as db from '../db/index';
-import type { Event, Topic } from '../db/types';
+import type { Topic } from '../db/types';
 
 const router = useRouter();
 const route = useRoute();
@@ -51,17 +53,26 @@ onMounted(() => {
         <h1 class="text-blue-500 text-lg">{{ topic?.title }}</h1>
         <p class="text-sm text-pink-700" v-if="topic?.desc">{{ topic?.desc }}</p>
       </div>
-      <Button class-name="text-2xl px-2 h-8" @click="dialogVisible = true">
-        <template #icon>
-          <Icon class-name="i-solar:add-circle-linear" />
-        </template>
-        <template>
-          New Event
-        </template>
-      </Button>
+      <div />
     </header>
+    <div class="flex items-center mt-2 ml-6 mr-6">
+      <Button class-name="box-content text-3xl p-2 mr-5">
+        <template #icon>
+          <Icon class-name="i-solar:play-circle-bold-duotone mr-2" />
+        </template>
+        <span class="text-xs">Start Now!</span>
+      </Button>
+      <Button class-name="text-lg px-2" @click="dialogVisible = true">
+        <template #icon>
+          <Icon class-name="i-solar:add-circle-linear mr-2" />
+        </template>
+        <span class="text-xs">
+          Start a work with description
+        </span>
+      </Button>
+    </div>
     <div>
-
+      <Timer />
     </div>
   </div>
   <Modal :visible="dialogVisible" @hide="dialogVisible = false">

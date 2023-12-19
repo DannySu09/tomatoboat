@@ -14,20 +14,6 @@ CREATE TABLE topic (
   );
 }
 
-export function createTableEvent(db: Database) {
-  return db.execute(
-    `
-CREATE TABLE event (
-  id VARCHAR PRIMARY KEY,
-  title TEXT NOT NULL,
-  topic_id VARCHAR,
-  began_at DATETIME NOT NULL,
-  ended_at DATETIME
-);
-    `
-  );
-}
-
 export function createTableWork(db: Database) {
   return db.execute(
     `

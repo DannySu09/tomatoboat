@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api";
 import Database from "tauri-plugin-sql-api";
-import { createTableEvent, createTableWork, createTableTopic } from './init';
+import { createTableWork, createTableTopic } from './init';
 import type { NewTopic } from "./types";
 import { validateNewTopic } from "../utils/validators";
 
@@ -14,9 +14,6 @@ export async function initDb(cb: () => void) {
     globalDb = db = await Database.load("sqlite:tomatoboat.db");
   }
 
-  try {
-    await createTableEvent(db);
-  } catch(e) {}
   try {
     await createTableWork(db);
   } catch(e) {}
