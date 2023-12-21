@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, reactive, ref, Transition } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import Button from '../components/base/Button.vue';
@@ -16,8 +16,15 @@ const router = useRouter();
 const route = useRoute();
 
 const topicId = route.params.id as string;
+
 const topic = ref<Topic>();
-const events = ref<Event[]>();
+
+const workState = reactive({
+  started: false,
+  title: '',
+  rounds: 0
+});
+const timerState = ref<'focus' | 'break'>('focus');
 
 const dialogVisible = ref(false);
 
@@ -25,19 +32,23 @@ function goBackHome() {
   router.replace(routes.home)
 }
 
-async function getTopicDetail () {
+async function getTopicDetail() {
   const res = await db.getTopic(topicId) as Topic[];
   topic.value = res[0];
 }
 
-async function getEvents() {
-  const res = await db.getEvents(topicId) as Event[];
-  events.value = res;
+function startWork(title = topic.value?.title) {
+  workState.started = true;
+  workState.title = title ?? '';
+}
+
+function stopWork() {
+  workState.started = false;
+  workState.title = '';
 }
 
 onMounted(() => {
   getTopicDetail();
-  getEvents();
 });
 </script>
 
@@ -55,24 +66,36 @@ onMounted(() => {
       </div>
       <div />
     </header>
-    <div class="flex items-center mt-2 ml-6 mr-6">
-      <Button class-name="box-content text-3xl p-2 mr-5">
-        <template #icon>
-          <Icon class-name="i-solar:play-circle-bold-duotone mr-2" />
-        </template>
-        <span class="text-xs">Start Now!</span>
-      </Button>
-      <Button class-name="text-lg px-2" @click="dialogVisible = true">
-        <template #icon>
-          <Icon class-name="i-solar:add-circle-linear mr-2" />
-        </template>
-        <span class="text-xs">
-          Start a work with description
-        </span>
-      </Button>
-    </div>
-    <div>
-      <Timer />
+    <div class="relative">
+      <Transition>
+        <div v-if="!workState.started" class="absolute top-0 left-0 w-full flex items-center mt-2 ml-6 mr-6">
+          <Button @click="startWork" class-name="box-content text-3xl p-2 mr-5">
+            <template #icon>
+              <Icon class-name="i-solar:play-circle-bold-duotone mr-2" />
+            </template>
+            <span class="text-xs">Start Now!</span>
+          </Button>
+          <Button class-name="text-lg px-2" @click="dialogVisible = true">
+            <template #icon>
+              <Icon class-name="i-solar:add-circle-linear mr-2" />
+            </template>
+            <span class="text-xs">
+              Start a work with description
+            </span>
+          </Button>
+        </div>
+        <div v-else class="absolute top-0 left-0 w-full ">
+          <Timer :current-state="timerState" />
+          <Button @click="stopWork" state="danger" class-name="box-content text-3xl py-3 px-3 m-auto">
+            <template #icon>
+              <Icon class-name="text-5xl i-solar:stop-circle-bold-duotone mr-2" />
+            </template>
+            <span class="text-sm">
+              Stop current work
+            </span>
+          </Button>
+        </div>
+      </Transition>
     </div>
   </div>
   <Modal :visible="dialogVisible" @hide="dialogVisible = false">
