@@ -7,7 +7,7 @@
   },
   "package": {
     "productName": "tomatoboat",
-    "version": "0.0.0"
+    "version": "0.0.1"
   },
   "tauri": {
     "allowlist": {
@@ -40,10 +40,11 @@
     },
     "windows": [
       {
-        "fullscreen": false,
+        "title": "Tomato Boat",
+        "titleBarStyle": "Transparent",
         "resizable": true,
-        "title": "",
-        "titleBarStyle": "Transparent"
+        "decorations": true,
+        "transparent": true
       }
     ]
   }

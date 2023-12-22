@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, Transition } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { invoke } from '@tauri-apps/api';
 
 import Button from '../components/base/Button.vue';
 import Icon from '../components/base/Icon.vue';
@@ -40,11 +41,13 @@ async function getTopicDetail() {
 function startWork(title = topic.value?.title) {
   workState.started = true;
   workState.title = title ?? '';
+  invoke("block_websites");
 }
 
 function stopWork() {
   workState.started = false;
   workState.title = '';
+  invoke("unblock_websites");
 }
 
 onMounted(() => {

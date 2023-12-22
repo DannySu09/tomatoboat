@@ -1,63 +1,116 @@
-use std::fs;
-use std::fs::File;
-use std::io::{Write, BufReader, BufRead};
+use std::fs::{File, OpenOptions, read_to_string, remove_file, rename};
+use std::io::Write;
 use std::path::Path;
+use home;
 
+// write host mapping to the host file
 pub fn block_websites(path: &Path, domain_list: Vec<&str>, mark: &str) {
+  unblock_websites(path, mark);
+
   let mut file = read_host_file(&path).unwrap();
   let content_to_write = domain_list
     .into_iter()
     .map(|domain| {
-      format!("{} {}", domain, "127.0.0.1")
+      format!("{} {}", "127.0.0.1", domain)
     });
 
-  let _ =file.write(mark.as_bytes());
-
-  for host in content_to_write {
-    let _ = file.write(host.as_bytes());
+  if let Err(_) = writeln!(file, "{}", mark) {
+    eprintln!("Write starting mark failed");
   }
 
-  let _ = file.write(mark.as_bytes());
+  for host in content_to_write {
+    if let Err(_) = writeln!(file, "{}", host) {
+      eprintln!("Write line failed");
+    }
+  }
+
+  if let Err(_) = writeln!(file, "{}", mark) {
+    eprintln!("Write ending mark failed");
+  }
+
+  remove_browsers_cache(false);
 }
 
 pub fn unblock_websites(path: &Path, mark: &str) {
-  let file = read_host_file(&path).unwrap();
+  let file = match read_to_string(path) {
+    Ok(file) => file,
+    Err(_) => return,
+  };
 
-  let lines = BufReader::new(&file).lines();
+  let lines = file.lines();
+
   let mut is_inside_modified_content = false;
-  let mut contents = Vec::new();
+  let bk_file_path_str = String::from(path.to_str().unwrap()) + ".bk";
+  let bk_file_path = Path::new(&bk_file_path_str);
+  let mut bk_file = read_host_file(&bk_file_path).unwrap();
 
   for line in lines  {
-    let line_content = line.unwrap();
-    if &line_content == mark {
+    if line == mark {
       is_inside_modified_content = !is_inside_modified_content;
-    }
-
-    if is_inside_modified_content {
       continue;
     }
 
-    contents.push(line_content);
+    if is_inside_modified_content || line.len() == 0 {
+      continue;
+    }
+
+    if let Err(_) = writeln!(bk_file, "{}", line) {
+      eprintln!("Recover Host file failed.");
+    }
+
+    remove_browsers_cache(true);
   }
 
-  let bk_file_path = String::from(path.to_str().unwrap()) + ".bk";
-  let mut new_file = File::create(&bk_file_path).unwrap();
-
-  let _ = new_file.write(contents.join("\n").as_bytes());
-  let _ = fs::remove_file(path);
-  let _ = fs::rename(bk_file_path, path);
+  match remove_file(path) {
+      Ok(_) => {
+        let _ = rename(bk_file_path, path);
+      }
+      Err(_) => {
+        eprintln!("Failed to remove Host file");
+      }
+  }
 }
 
-fn read_host_file(path: &Path) -> Result<File, &'static str> {
-  if !path.exists() || !path.is_file() {
-    return Err("File does not exist or is not a regular file")
+fn read_host_file(path: &Path) -> Result<File, std::io::Error> {
+  OpenOptions::new().write(true).create(true).append(true).open(path)
+}
+
+// copied from https://github.com/SelfControlApp/selfcontrol/blob/master/Common/Utility/SCHelperToolUtilities.m
+const BROWSERS_CACHE_PATH: [&str; 5] = [
+  // chrome
+  "/Library/Caches/Google/Chrome/Default",
+  "/Library/Caches/Google/Chrome/com.google.Chrome",
+
+  // firefox
+  "/Library/Caches/Firefox/Profiles",
+
+  // safari
+  "/Library/Caches/com.apple.Safari",
+  "/Library/Containers/com.apple.Safari/Data/Library/Caches"
+];
+
+fn remove_browsers_cache(is_reverse: bool) {
+  let home_dir_path = home::home_dir().unwrap();
+  let home_dir = home_dir_path.to_str().unwrap();
+
+  println!("home directory detected: {}", home_dir);
+  let browsers_cache_path_iter = BROWSERS_CACHE_PATH.iter()
+    .map(|entry| {
+      home_dir.to_string() + entry
+    });
+
+  for cache_path in browsers_cache_path_iter {
+    let bk_cache_path_str = String::clone(&cache_path) + "_bk";
+    let bk_cache_path = Path::new(&bk_cache_path_str);
+
+    if is_reverse {
+      if let Err(e) = rename(&bk_cache_path, Path::new(&cache_path)) {
+        eprintln!("Failed to recover cache at {}: {}", bk_cache_path_str, e.to_string())
+      }
+    } else {
+      if let Err(e) = rename(Path::new(&cache_path), bk_cache_path) {
+        eprintln!("Failed to remove cache at {}: {}", cache_path, e.to_string())
+      }
+    }
   }
-
-  let file = File::open(path);
-
-  if file.is_err() {
-    return Err("Could not open the file");
-  }
-
-  Ok(file.unwrap())
 }
