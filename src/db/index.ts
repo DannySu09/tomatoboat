@@ -1,7 +1,7 @@
 import { invoke } from "@tauri-apps/api";
 import Database from "tauri-plugin-sql-api";
 import { createTableWork, createTableTopic } from './init';
-import type { NewTopic } from "./types";
+import type { NewTopic, NewWork } from "./types";
 import { validateNewTopic } from "../utils/validators";
 
 let globalDb: Database;
@@ -42,6 +42,15 @@ export function getTopic(id: string) {
 }
 
 // event
-export function getEvents(topicId: string) {
-  return globalDb.select("select * from event where topic_id=$1", [topicId]);
+export function getWorks(topicId: string) {
+  return globalDb.select("select * from work where topic_id=$1", [topicId]);
+}
+
+export async function createWork(event: NewWork) {
+  const newId = await invoke("get_uuid");
+
+  return globalDb.execute(
+    "insert into work (id, began_at, ended_at, desc, topic_id) values ($1, $2, $3, $4, $5)",
+    [newId, event.began_at, event.ended_at, event.desc, event.topic_id]
+  )
 }

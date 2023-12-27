@@ -1,9 +1,16 @@
 <script setup lang="ts">
+import { invoke } from '@tauri-apps/api';
+import { appWindow } from '@tauri-apps/api/window';
 import { ref, computed, onUnmounted, watch, onMounted } from 'vue';
 
-type State = 'focus' | 'break';
+type State = 'focus' | 'break' | 'stopped';
 type Events = {
   (e: 'timer:end', type: State): void;
+}
+type ClockEventPayload = {
+  start_time: number;
+  left_time: number;
+  duration: number;
 }
 
 const { currentState } = defineProps<{
@@ -11,8 +18,8 @@ const { currentState } = defineProps<{
 }>();
 
 const startTime = ref(0);
-const currentTime = ref(0);
-const timerId = ref(0);
+const leftTime = ref(0);
+const clockEventListener = ref<() => any>(() => {});
 
 const FOCUS_DURATION = 25 * 60 * 1000;
 const BREAK_DURATION = 5 * 60 * 1000;
@@ -32,10 +39,10 @@ const duration = computed(() => {
 const emit = defineEmits<Events>();
 
 const countdownTime = computed(() => {
-  const totalSeconds = Math.round((duration.value - currentTime.value + startTime.value) / 1000);
+  const totalSeconds = Math.round(leftTime.value / 1000);
 
   if (totalSeconds === 0) {
-    return '';
+    return '00 : 00';
   }
   const seconds = totalSeconds % 60;
   const minutes = Math.round((totalSeconds - seconds) / 60);
@@ -44,40 +51,43 @@ const countdownTime = computed(() => {
 });
 
 function reset() {
+  appWindow.emit("clock:end", `${startTime.value}`);
+
   startTime.value = 0;
-  currentTime.value = 0;
+  leftTime.value = 0;
+  clockEventListener.value();
 }
 
-function run() {
+async function run() {
   if (startTime.value === 0) {
     startTime.value = Date.now();
-    currentTime.value = Date.now();
   }
 
-  return window.requestAnimationFrame(() => {
-    if (Date.now() - currentTime.value >= 1000) {
-      if (currentTime.value - startTime.value >= duration.value) {
-        emit('timer:end', currentState);
-        return -1;
-      }
+  clockEventListener.value = await appWindow.listen<ClockEventPayload>("clock:run", (evt) => {
+    const { payload } = evt;
+    if (payload.start_time !== startTime.value) return;
 
-      currentTime.value = currentTime.value + 1000;
-    }
+    leftTime.value = payload.left_time;
+  });
 
-    run();
+  invoke("start_clock", {
+    startTime: startTime.value,
+    duration: duration.value
   });
 }
 
 watch(() => currentState, () => {
   reset();
+
+  if (currentState === "stopped") {
+    return;
+  }
+
   run();
 });
 
 onMounted(run);
-onUnmounted(() => {
-  reset();
-  window.cancelAnimationFrame(timerId.value);
-});
+onUnmounted(reset);
 
 </script>
 
@@ -93,6 +103,6 @@ onUnmounted(() => {
   @import url('https://fonts.googleapis.com/css2?family=Inconsolata&display=swap');
   .countdown {
     font-family: Inconsolata, monospace;
-    font-size: 8rem;
+    font-size: 7rem;
   }
 </style>

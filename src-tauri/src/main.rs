@@ -18,7 +18,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             commands::get_uuid,
             commands::block_websites,
-            commands::unblock_websites
+            commands::unblock_websites,
+            commands::start_clock
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

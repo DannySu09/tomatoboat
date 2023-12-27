@@ -19,7 +19,7 @@ export function createTableWork(db: Database) {
     `
 CREATE TABLE work (
   id VARCHAR PRIMARY KEY,
-  event_id VARCHAR NOT NULL,
+  topic_id VARCHAR NOT NULL,
   began_at DATETIME NOT NULL,
   ended_at DATETIME,
   desc TEXT

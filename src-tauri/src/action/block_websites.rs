@@ -15,17 +15,17 @@ pub fn block_websites(path: &Path, domain_list: Vec<&str>, mark: &str) {
     });
 
   if let Err(_) = writeln!(file, "{}", mark) {
-    eprintln!("Write starting mark failed");
+    // eprintln!("Write starting mark failed");
   }
 
   for host in content_to_write {
     if let Err(_) = writeln!(file, "{}", host) {
-      eprintln!("Write line failed");
+      // eprintln!("Write line failed");
     }
   }
 
   if let Err(_) = writeln!(file, "{}", mark) {
-    eprintln!("Write ending mark failed");
+    // eprintln!("Write ending mark failed");
   }
 
   remove_browsers_cache(false);
@@ -55,7 +55,7 @@ pub fn unblock_websites(path: &Path, mark: &str) {
     }
 
     if let Err(_) = writeln!(bk_file, "{}", line) {
-      eprintln!("Recover Host file failed.");
+      // eprintln!("Recover Host file failed.");
     }
 
     remove_browsers_cache(true);
@@ -93,7 +93,6 @@ fn remove_browsers_cache(is_reverse: bool) {
   let home_dir_path = home::home_dir().unwrap();
   let home_dir = home_dir_path.to_str().unwrap();
 
-  println!("home directory detected: {}", home_dir);
   let browsers_cache_path_iter = BROWSERS_CACHE_PATH.iter()
     .map(|entry| {
       home_dir.to_string() + entry
@@ -105,11 +104,11 @@ fn remove_browsers_cache(is_reverse: bool) {
 
     if is_reverse {
       if let Err(e) = rename(&bk_cache_path, Path::new(&cache_path)) {
-        eprintln!("Failed to recover cache at {}: {}", bk_cache_path_str, e.to_string())
+        // eprintln!("Failed to recover cache at {}: {}", bk_cache_path_str, e.to_string())
       }
     } else {
       if let Err(e) = rename(Path::new(&cache_path), bk_cache_path) {
-        eprintln!("Failed to remove cache at {}: {}", cache_path, e.to_string())
+        // eprintln!("Failed to remove cache at {}: {}", cache_path, e.to_string())
       }
     }
   }

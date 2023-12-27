@@ -22,7 +22,7 @@ const stateClass = computed(() => {
 
 <template>
 <button
-  :class="`flex justify-center items-center p-1 h-7 rounded-xl bg-transparent transition hover:scale-105 ${className} ${stateClass}`"
+  :class="`inline-flex justify-center items-center p-1 h-7 rounded-xl bg-transparent transition hover:scale-105 ${className} ${stateClass}`"
 >
   <slot name="icon"></slot>
   <slot></slot>
