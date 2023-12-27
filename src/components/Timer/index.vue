@@ -103,6 +103,6 @@ onUnmounted(reset);
   @import url('https://fonts.googleapis.com/css2?family=Inconsolata&display=swap');
   .countdown {
     font-family: Inconsolata, monospace;
-    font-size: 7rem;
+    font-size: 15vw;
   }
 </style>
