@@ -12,7 +12,6 @@ import { default as Timer, State as TimerState } from '../components/Timer/index
 import routes from '../routes';
 import * as db from '../db/index';
 import type { NewWork, Topic, Work } from '../db/types';
-import { invoke } from '@tauri-apps/api';
 
 const router = useRouter();
 const route = useRoute();
@@ -58,8 +57,6 @@ function startWork() {
     dialogState.visible = false;
     dialogState.description = '';
   }
-
-  invoke("block_websites");
 }
 
 function giveUpWork() {
@@ -78,11 +75,9 @@ async function handleTimerStatusChanged(state: TimerState) {
       timerState.value = "break";
       await db.createWork(workState);
       getCurrentTopicWorks();
-      invoke("unblock_websites");
       break;
     case "stopped":
       giveUpWork();
-      invoke("unblock_websites");
       break;
     default:
   }
