@@ -1,4 +1,4 @@
-use std::fs::{File, OpenOptions, read_to_string, remove_file, rename};
+use std::fs::{File, OpenOptions, read_to_string, remove_file, rename, remove_dir_all};
 use std::io::Write;
 use std::path::Path;
 use home;
@@ -7,28 +7,42 @@ use home;
 pub fn block_websites(path: &Path, domain_list: Vec<&str>, mark: &str) {
   unblock_websites(path, mark);
 
-  let mut file = read_host_file(&path).unwrap();
-  let content_to_write = domain_list
-    .into_iter()
-    .map(|domain| {
-      format!("{} {}", "127.0.0.1", domain)
-    });
+  let mut file = match read_host_file(&path) {
+    Ok(file) => file,
+    Err(_) => {
+      println!("Failed to block websites");
+      return;
+    },
+  };
+
+  let mut content_to_write: Vec<String> = Vec::new();
+
+  for domain in domain_list.into_iter() {
+    let has_www = domain.starts_with("www");
+
+    if !has_www {
+      content_to_write.push(format!("0.0.0.0 www.{}", domain));
+      content_to_write.push(format!(":: www.{}", domain));
+    }
+    content_to_write.push(format!("0.0.0.0 {}", domain));
+    content_to_write.push(format!(":: {}", domain));
+  }
 
   if let Err(_) = writeln!(file, "{}", mark) {
-    // eprintln!("Write starting mark failed");
+    eprintln!("Write starting mark failed");
   }
 
   for host in content_to_write {
     if let Err(_) = writeln!(file, "{}", host) {
-      // eprintln!("Write line failed");
+      eprintln!("Write line failed");
     }
   }
 
   if let Err(_) = writeln!(file, "{}", mark) {
-    // eprintln!("Write ending mark failed");
+    eprintln!("Write ending mark failed");
   }
 
-  remove_browsers_cache(false);
+  remove_browsers_cache();
 }
 
 pub fn unblock_websites(path: &Path, mark: &str) {
@@ -57,8 +71,6 @@ pub fn unblock_websites(path: &Path, mark: &str) {
     if let Err(_) = writeln!(bk_file, "{}", line) {
       // eprintln!("Recover Host file failed.");
     }
-
-    remove_browsers_cache(true);
   }
 
   match remove_file(path) {
@@ -89,7 +101,7 @@ const BROWSERS_CACHE_PATH: [&str; 5] = [
   "/Library/Containers/com.apple.Safari/Data/Library/Caches"
 ];
 
-fn remove_browsers_cache(is_reverse: bool) {
+fn remove_browsers_cache() {
   let home_dir_path = home::home_dir().unwrap();
   let home_dir = home_dir_path.to_str().unwrap();
 
@@ -99,17 +111,8 @@ fn remove_browsers_cache(is_reverse: bool) {
     });
 
   for cache_path in browsers_cache_path_iter {
-    let bk_cache_path_str = String::clone(&cache_path) + "_bk";
-    let bk_cache_path = Path::new(&bk_cache_path_str);
-
-    if is_reverse {
-      if let Err(e) = rename(&bk_cache_path, Path::new(&cache_path)) {
-        // eprintln!("Failed to recover cache at {}: {}", bk_cache_path_str, e.to_string())
-      }
-    } else {
-      if let Err(e) = rename(Path::new(&cache_path), bk_cache_path) {
-        // eprintln!("Failed to remove cache at {}: {}", cache_path, e.to_string())
-      }
-    }
+    remove_dir_all(Path::new(&cache_path)).unwrap_or_else(|e| {
+      eprintln!("Failed to remove cache at {}: {}", cache_path, e.to_string())
+    });
   }
 }

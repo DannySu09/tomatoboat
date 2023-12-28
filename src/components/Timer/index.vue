@@ -3,9 +3,9 @@ import { invoke } from '@tauri-apps/api';
 import { appWindow } from '@tauri-apps/api/window';
 import { ref, computed, onUnmounted, watch, onMounted } from 'vue';
 
-type State = 'focus' | 'break' | 'stopped';
+export type State = 'focus' | 'break' | 'stopped';
 type Events = {
-  (e: 'timer:end', type: State): void;
+  (e: 'timer:changed', type: State): void;
 }
 type ClockEventPayload = {
   start_time: number;
@@ -51,7 +51,7 @@ const countdownTime = computed(() => {
 });
 
 function reset() {
-  appWindow.emit("clock:end", `${startTime.value}`);
+  appWindow.emit("clock:stopped", `${startTime.value}`);
 
   startTime.value = 0;
   leftTime.value = 0;
@@ -68,6 +68,15 @@ async function run() {
     if (payload.start_time !== startTime.value) return;
 
     leftTime.value = payload.left_time;
+  });
+
+  await appWindow.listen("clock:stopped", () => {
+    if (leftTime.value === 0) {
+      emit("timer:changed", "break");
+      return;
+    }
+
+    emit("timer:changed", "stopped");
   });
 
   invoke("start_clock", {

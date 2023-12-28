@@ -12,7 +12,7 @@ pub fn start_clock(window: Window, start_time: u64, duration: u64) {
   let should_end = Arc::new(Mutex::new(false));
   let current_should_end = Arc::clone(&should_end);
 
-  window.listen("clock:end", move |_| {
+  window.listen("clock:stopped", move |_| {
     let should_end = Arc::clone(&should_end);
     let mut current_should_end = should_end.lock().unwrap();
 
@@ -26,7 +26,8 @@ pub fn start_clock(window: Window, start_time: u64, duration: u64) {
 
     while current_milliseconds < total_milliseconds {
       if *current_should_end.lock().unwrap() {
-        break;
+        window.emit("clock:stopped", "").unwrap();
+        return;
       }
 
       let left_time = total_milliseconds - current_milliseconds;
@@ -42,5 +43,7 @@ pub fn start_clock(window: Window, start_time: u64, duration: u64) {
       current_milliseconds = current_milliseconds + 1000;
       thread::sleep(Duration::from_secs(1));
     }
+
+    window.emit("clock:stopped", "").unwrap();
   });
 }

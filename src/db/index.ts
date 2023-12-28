@@ -41,6 +41,11 @@ export function getTopic(id: string) {
   return globalDb.select("select * from topic where id = $1", [id]);
 }
 
+export async function deleteTopic(topicId: string) {
+  await globalDb.execute("delete from work where topic_id=$1", [topicId]);
+  await globalDb.execute("delete from topic where id=$1", [topicId]);
+}
+
 // event
 export function getWorks(topicId: string) {
   return globalDb.select("select * from work where topic_id=$1", [topicId]);
