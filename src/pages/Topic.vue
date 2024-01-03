@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, Transition } from 'vue';
+import { onMounted, reactive, ref, Transition, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { format } from 'date-fns';
+import dayjs from 'dayjs';
 
 import Button from '../components/base/Button.vue';
 import Icon from '../components/base/Icon.vue';
@@ -12,6 +12,7 @@ import { default as Timer, State as TimerState } from '../components/Timer/index
 import routes from '../routes';
 import * as db from '../db/index';
 import type { NewWork, Topic, Work } from '../db/types';
+import { invoke } from '@tauri-apps/api';
 
 const router = useRouter();
 const route = useRoute();
@@ -26,6 +27,7 @@ const initialWorkState: NewWork = {
 
 const topic = ref<Topic>();
 const currentWorks = ref<Work[]>([]);
+const descriptionTextareaRef = ref<HTMLTextAreaElement>();
 
 let workState = reactive<NewWork>(initialWorkState);
 const timerState = ref<TimerState>('stopped');
@@ -48,6 +50,13 @@ async function getCurrentTopicWorks() {
   currentWorks.value = res;
 }
 
+function showStartWithContextModal() {
+  dialogState.visible = true;
+  nextTick(() => {
+    descriptionTextareaRef.value?.focus();
+  });
+}
+
 function startWork() {
   timerState.value = 'focus';
   workState.began_at = Date.now();
@@ -57,24 +66,36 @@ function startWork() {
     dialogState.visible = false;
     dialogState.description = '';
   }
+
+  invoke("block_websites");
+}
+
+function startBreak() {
+  timerState.value = 'break';
+  workState.began_at = Date.now();
+
+  invoke("unblock_websites");
 }
 
 function giveUpWork() {
-  for (let p in initialWorkState) {
-    // @ts-ignore
-    workState[p as keyof NewWork] = initialWorkState[p as keyof NewWork]
-  }
+  workState.desc = '';
+  workState.began_at = 0;
 
   dialogState.description = '';
   timerState.value = "stopped";
 }
 
 async function handleTimerStatusChanged(state: TimerState) {
-  switch(state) {
+  if (state !== "focus") {
+    invoke("unblock_websites");
+  }
+
+  switch (state) {
     case "break":
-      timerState.value = "break";
+      workState.ended_at = Date.now();
       await db.createWork(workState);
       getCurrentTopicWorks();
+      startBreak();
       break;
     case "stopped":
       giveUpWork();
@@ -87,7 +108,7 @@ function formatTime(ts?: number) {
   if (!ts) {
     return '';
   }
-  return format(ts, 'mm-dd HH:MM')
+  return dayjs(ts).format("MM-DD HH:MM")
 }
 
 onMounted(() => {
@@ -110,34 +131,33 @@ onMounted(() => {
       </Button>
       <div class="w-8" v-else />
       <div class="text-center">
-        <h1 class="text-blue-500 text-lg">{{ topic?.title }}</h1>
-        <p class="text-sm text-pink-700" v-if="topic?.desc">{{ topic?.desc }}</p>
+        <h1 class="text-blue-500 text-lg">{{ workState?.desc || topic?.title }}</h1>
+        <p v-if="!workState.desc && topic?.desc" class="text-sm text-pink-700">{{ topic?.desc }}</p>
       </div>
       <div class="w-8" />
     </header>
 
     <!-- The clock -->
-    <div class="relative mt-20 flex-grow-1 flex-shrink-1">
+    <div class="relative mt-16 flex-grow-1 flex-shrink-1">
       <Transition>
         <div v-if="timerState == 'stopped'" class="flex">
           <div class="flex-grow-1 flex justify-center items-center">
-            <div class="text-center">
-              <Button @click="startWork" class-name="box-content text-3xl p-3 mb-3">
-                <template #icon>
-                  <Icon class-name="i-solar:play-circle-bold-duotone mr-2" />
-                </template>
-                <span class="text-base">Start working!</span>
-              </Button>
-              <br>
-              <Button class-name="text-sm p-3" @click="dialogState.visible = true">
+            <div class="text-center text-xl">
+              <Button class-name="box-content p-3"
+                @click="showStartWithContextModal">
                 <template #icon>
                   <Icon class-name="text-xl i-solar:add-circle-linear mr-2" />
                 </template>
-                <span class="text-xs">
+                <span class="text-sm">
                   Start a work with context
                 </span>
               </Button>
-
+              <Button @click="startWork" class-name="box-content p-3 ml-3">
+                <template #icon>
+                  <Icon class-name="i-solar:play-circle-bold-duotone mr-2" />
+                </template>
+                <span class="text-base">Start a work!</span>
+              </Button>
             </div>
           </div>
           <div v-if="currentWorks.length > 0" class="flex-grow-1 overflow-auto opacity-70">
@@ -145,7 +165,8 @@ onMounted(() => {
               <p class="text-sm text-blue-600">
                 {{ work.desc || topic?.desc }}
               </p>
-              <small class="text-xs text-blue-300">{{ formatTime(work.began_at) }} to {{ formatTime(work.ended_at) }}</small>
+              <small v-if="work.ended_at" class="text-xs text-blue-300">{{ formatTime(work.began_at) }} to {{
+                formatTime(work.ended_at) }}</small>
             </div>
           </div>
         </div>
@@ -160,7 +181,7 @@ onMounted(() => {
             <span v-if="timerState === 'focus'" class="text-sm">
               Stop current work
             </span>
-            <span v-if="timerState === 'break'">
+            <span v-if="timerState === 'break'" class="text-sm">
               Stop the circle
             </span>
           </Button>
@@ -175,8 +196,9 @@ onMounted(() => {
       Start a work with context
     </template>
     <template #body>
-      <textarea class="w-full bg-transparent text-base text-gray-7 mt-8 p-4" v-model="dialogState.description" cols="30"
-        rows="3" placeholder="enter the description of the work..."></textarea>
+      <textarea ref="descriptionTextareaRef" autofocus class="w-full bg-transparent text-base text-gray-7 mt-8 p-4"
+        v-model="dialogState.description" cols="30" rows="3"
+        placeholder="enter the description of the work..."></textarea>
     </template>
     <template #footer>
       <Button @click="startWork" state="default" class-name="text-blue-500 w-1/2 h-8 rounded-sm">

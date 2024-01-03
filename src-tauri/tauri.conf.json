@@ -21,6 +21,18 @@
       },
       "notification": {
         "all": true
+      },
+      "fs": {
+        "scope": {
+          "allow": [
+            "/etc/hosts",
+            "$HOME/Library/Caches/Google/Chrome/Default",
+            "$HOME/Library/Caches/Google/Chrome/com.google.Chrome",
+            "$HOME/Library/Caches/Firefox/Profiles",
+            "$HOME/Library/Caches/com.apple.Safari",
+            "$HOME/Library/Containers/com.apple.Safari/Data/Library/Caches"
+          ]
+        }
       }
     },
     "bundle": {

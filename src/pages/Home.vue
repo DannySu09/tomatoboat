@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
+import Icon from '../components/base/Icon.vue';
 import CreateTopic from "../components/CreateTopic.vue";
 import TopicEntry from "../components/TopicEntry/index.vue";
 
@@ -39,7 +40,10 @@ onMounted(getTopics)
 
 <template>
   <div v-if="recentTopics.length === 0" class="w-full mt-20 text-center text-blue-300">
-    Not any topic here, please click the button at the <b class="text-blue-400">right bottom corner</b> to add.
+    <div>
+      <Icon class="block mb-2 i-solar:notification-remove-bold text-6xl text-blue-300" />
+    </div>
+    Not any topic here, please click the button at the <b class="text-blue-500">right bottom corner</b> to add.
   </div>
   <div class="container">
     <TopicEntry

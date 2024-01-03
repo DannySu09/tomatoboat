@@ -24,7 +24,7 @@ pub fn start_clock(window: Window, start_time: u64, duration: u64) {
     let total_milliseconds = duration;
     let mut current_milliseconds = 0;
 
-    while current_milliseconds < total_milliseconds {
+    while current_milliseconds <= total_milliseconds {
       if *current_should_end.lock().unwrap() {
         window.emit("clock:stopped", "").unwrap();
         return;

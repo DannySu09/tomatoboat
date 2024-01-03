@@ -1,4 +1,4 @@
-use std::fs::{File, OpenOptions, read_to_string, remove_file, rename, remove_dir_all};
+use std::fs::{File, OpenOptions, read_to_string, remove_dir_all, self};
 use std::io::Write;
 use std::path::Path;
 use home;
@@ -17,7 +17,7 @@ pub fn block_websites(path: &Path, domain_list: Vec<&str>, mark: &str) {
 
   let mut content_to_write: Vec<String> = Vec::new();
 
-  for domain in domain_list.into_iter() {
+  for domain in domain_list {
     let has_www = domain.starts_with("www");
 
     if !has_www {
@@ -46,17 +46,14 @@ pub fn block_websites(path: &Path, domain_list: Vec<&str>, mark: &str) {
 }
 
 pub fn unblock_websites(path: &Path, mark: &str) {
-  let file = match read_to_string(path) {
+  let host_file_content = match read_to_string(path) {
     Ok(file) => file,
     Err(_) => return,
   };
 
-  let lines = file.lines();
-
+  let lines = host_file_content.lines();
   let mut is_inside_modified_content = false;
-  let bk_file_path_str = String::from(path.to_str().unwrap()) + ".bk";
-  let bk_file_path = Path::new(&bk_file_path_str);
-  let mut bk_file = read_host_file(&bk_file_path).unwrap();
+  let mut new_content_lines: Vec<&str> = vec![];
 
   for line in lines  {
     if line == mark {
@@ -68,19 +65,13 @@ pub fn unblock_websites(path: &Path, mark: &str) {
       continue;
     }
 
-    if let Err(_) = writeln!(bk_file, "{}", line) {
-      // eprintln!("Recover Host file failed.");
-    }
+    new_content_lines.push(line);
   }
 
-  match remove_file(path) {
-      Ok(_) => {
-        let _ = rename(bk_file_path, path);
-      }
-      Err(_) => {
-        eprintln!("Failed to remove Host file");
-      }
-  }
+  let new_content = new_content_lines.join("\n");
+  fs::write(path, new_content).unwrap_or_else(|e| {
+    eprintln!("Failed to write into the host file: {}", e.to_string());
+  });
 }
 
 fn read_host_file(path: &Path) -> Result<File, std::io::Error> {

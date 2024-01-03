@@ -16,7 +16,7 @@ const emits = defineEmits<Event>();
 </script>
 
 <template>
-  <div class="relative z-10" v-show="visible">
+  <div tabindex="-1" class="relative z-10" v-show="visible">
     <Transition name="fade">
       <div class="fixed w-full h-full left-0 top-0 transition bg-gray-700 opacity-60" @click="emits('hide')" />
     </Transition>

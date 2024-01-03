@@ -7,22 +7,26 @@ export type State = 'focus' | 'break' | 'stopped';
 type Events = {
   (e: 'timer:changed', type: State): void;
 }
+
 type ClockEventPayload = {
   start_time: number;
   left_time: number;
   duration: number;
 }
 
-const { currentState } = defineProps<{
-  currentState: State
+const props = defineProps<{
+  currentState: State;
+  class?: string;
 }>();
+
+const { currentState } = props;
 
 const startTime = ref(0);
 const leftTime = ref(0);
-const clockEventListener = ref<() => any>(() => {});
+const unregisterClockListener = ref<() => any>(() => {});
 
-const FOCUS_DURATION = 25 * 60 * 1000;
-const BREAK_DURATION = 5 * 60 * 1000;
+const FOCUS_DURATION = 0.05 * 60 * 1000;
+const BREAK_DURATION = 0.05 * 60 * 1000;
 
 const duration = computed(() => {
   if (currentState === 'focus') {
@@ -51,11 +55,9 @@ const countdownTime = computed(() => {
 });
 
 function reset() {
-  appWindow.emit("clock:stopped", `${startTime.value}`);
-
   startTime.value = 0;
   leftTime.value = 0;
-  clockEventListener.value();
+  unregisterClockListener.value();
 }
 
 async function run() {
@@ -63,7 +65,7 @@ async function run() {
     startTime.value = Date.now();
   }
 
-  clockEventListener.value = await appWindow.listen<ClockEventPayload>("clock:run", (evt) => {
+  unregisterClockListener.value = await appWindow.listen<ClockEventPayload>("clock:run", (evt) => {
     const { payload } = evt;
     if (payload.start_time !== startTime.value) return;
 
@@ -85,7 +87,7 @@ async function run() {
   });
 }
 
-watch(() => currentState, () => {
+watch(() => props.currentState, () => {
   reset();
 
   if (currentState === "stopped") {
