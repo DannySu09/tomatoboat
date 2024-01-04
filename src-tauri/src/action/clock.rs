@@ -26,7 +26,7 @@ pub fn start_clock(window: Window, start_time: u64, duration: u64) {
 
     while current_milliseconds <= total_milliseconds {
       if *current_should_end.lock().unwrap() {
-        window.emit("clock:stopped", "").unwrap();
+        window.emit("clock:stopped", start_time.to_string()).unwrap();
         return;
       }
 
@@ -44,6 +44,6 @@ pub fn start_clock(window: Window, start_time: u64, duration: u64) {
       thread::sleep(Duration::from_secs(1));
     }
 
-    window.emit("clock:stopped", "").unwrap();
+    window.emit("clock:stopped", start_time.to_string()).unwrap();
   });
 }

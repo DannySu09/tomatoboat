@@ -10,7 +10,7 @@ const { className, state = 'default' } = defineProps<Props>();
 const stateClass = computed(() => {
   switch (state) {
     case 'default':
-      return 'text-blue-300 hover:text-blue-500 hover:bg-gray-200';
+      return 'text-blue-300 hover:text-blue-500 hover:bg-gray-200 disabled:text-gray-200';
     case 'danger':
       return 'text-pink-400 hover:text-gray-100 hover:bg-pink-600';
     case 'highlight':
@@ -22,7 +22,7 @@ const stateClass = computed(() => {
 
 <template>
 <button
-  :class="`inline-flex justify-center items-center p-1 h-7 rounded-xl bg-transparent transition hover:scale-105 ${className} ${stateClass}`"
+  :class="`inline-flex justify-center items-center p-1 h-7 rounded-xl bg-transparent transition hover:scale-105 ${className} ${stateClass} disabled:bg-transparent disabled:cursor-not-allowed`"
 >
   <slot name="icon"></slot>
   <slot></slot>

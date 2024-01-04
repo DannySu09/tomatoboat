@@ -16,15 +16,7 @@ fn main() {
             Ok(())
         })
         .plugin(tauri_plugin_sql::Builder::default().build())
-        .menu(menu::set_menus())
-        .on_menu_event(|event| {
-            match event.menu_item_id() {
-                "quit" => {
-                    std::process::exit(0);
-                }
-                _ => {}
-            }
-        })
+        .system_tray(menu::set_menus())
         .invoke_handler(tauri::generate_handler![
             commands::get_uuid,
             commands::block_websites,

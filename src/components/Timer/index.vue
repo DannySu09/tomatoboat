@@ -5,7 +5,8 @@ import { ref, computed, onUnmounted, watch, onMounted } from 'vue';
 
 export type State = 'focus' | 'break' | 'stopped';
 type Events = {
-  (e: 'timer:changed', type: State): void;
+  (e: 'timer:ended'): void;
+  (e: 'timer:paused'): void;
 }
 
 type ClockEventPayload = {
@@ -23,10 +24,10 @@ const { currentState } = props;
 
 const startTime = ref(0);
 const leftTime = ref(0);
-const unregisterClockListener = ref<() => any>(() => {});
+const unregisterClockListener = ref<() => any>(() => { });
 
-const FOCUS_DURATION = 0.05 * 60 * 1000;
-const BREAK_DURATION = 0.05 * 60 * 1000;
+const FOCUS_DURATION = 25 * 60 * 1000; // 25 min
+const BREAK_DURATION = 5 * 60 * 1000; // 5 min
 
 const duration = computed(() => {
   if (currentState === 'focus') {
@@ -72,13 +73,17 @@ async function run() {
     leftTime.value = payload.left_time;
   });
 
-  await appWindow.listen("clock:stopped", () => {
-    if (leftTime.value === 0) {
-      emit("timer:changed", "break");
+  await appWindow.listen("clock:stopped", (event) => {
+    if (event.payload !== startTime.value.toString()) {
       return;
     }
 
-    emit("timer:changed", "stopped");
+    if (leftTime.value === 0) {
+      emit("timer:ended");
+      return;
+    }
+
+    emit("timer:paused");
   });
 
   invoke("start_clock", {
@@ -111,9 +116,10 @@ onUnmounted(reset);
 </template>
 
 <style scoped>
-  @import url('https://fonts.googleapis.com/css2?family=Inconsolata&display=swap');
-  .countdown {
-    font-family: Inconsolata, monospace;
-    font-size: 15vw;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata&display=swap');
+
+.countdown {
+  font-family: Inconsolata, monospace;
+  font-size: 15vw;
+}
 </style>

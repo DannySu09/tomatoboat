@@ -59,6 +59,10 @@
         "minWidth": 700,
         "minHeight": 500
       }
-    ]
+    ],
+    "systemTray": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": false
+    }
   }
 }

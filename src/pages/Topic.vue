@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, Transition, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import dayjs from 'dayjs';
 
 import Button from '../components/base/Button.vue';
 import Icon from '../components/base/Icon.vue';
@@ -57,10 +56,13 @@ function showStartWithContextModal() {
   });
 }
 
-function startWork() {
+function startWork(isContinued = false) {
   timerState.value = 'focus';
   workState.began_at = Date.now();
-  workState.desc = dialogState.description ?? topic.value?.title ?? '';
+
+  if (!isContinued) {
+    workState.desc = dialogState.description ?? topic.value?.title ?? '';
+  }
 
   if (dialogState.visible) {
     dialogState.visible = false;
@@ -85,30 +87,17 @@ function giveUpWork() {
   timerState.value = "stopped";
 }
 
-async function handleTimerStatusChanged(state: TimerState) {
-  if (state !== "focus") {
-    invoke("unblock_websites");
+async function handleFocusEnded() {
+  // when the break is ended
+  if (timerState.value === "break") {
+    return;
   }
 
-  switch (state) {
-    case "break":
-      workState.ended_at = Date.now();
-      await db.createWork(workState);
-      getCurrentTopicWorks();
-      startBreak();
-      break;
-    case "stopped":
-      giveUpWork();
-      break;
-    default:
-  }
-}
-
-function formatTime(ts?: number) {
-  if (!ts) {
-    return '';
-  }
-  return dayjs(ts).format("MM-DD HH:MM")
+  invoke("unblock_websites");
+  workState.ended_at = Date.now();
+  await db.createWork(workState);
+  getCurrentTopicWorks();
+  startBreak();
 }
 
 onMounted(() => {
@@ -122,8 +111,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col">
-    <header class="flex flex-grow-0 flex-shrink-0 justify-between mb-10 px-2 h-8">
+  <div class="flex flex-col h-full">
+    <header class="flex flex-grow-0 flex-shrink-0 justify-between px-2 h-8">
       <Button v-if="timerState == 'stopped'" @click="goBackHome" class-name="w-8 h-full text-3xl">
         <template #icon>
           <Icon class-name="i-solar:alt-arrow-left-outline" />
@@ -138,13 +127,12 @@ onMounted(() => {
     </header>
 
     <!-- The clock -->
-    <div class="relative mt-16 flex-grow-1 flex-shrink-1">
+    <div class="relative mt-10 flex-grow-1 flex-shrink-1 overflow-hidden">
       <Transition>
-        <div v-if="timerState == 'stopped'" class="flex">
-          <div class="flex-grow-1 flex justify-center items-center">
+        <div v-if="timerState == 'stopped'" class="h-full">
+          <div class="flex justify-center items-center">
             <div class="text-center text-xl">
-              <Button class-name="box-content p-3"
-                @click="showStartWithContextModal">
+              <Button class-name="box-content p-3" @click="showStartWithContextModal">
                 <template #icon>
                   <Icon class-name="text-xl i-solar:add-circle-linear mr-2" />
                 </template>
@@ -160,20 +148,48 @@ onMounted(() => {
               </Button>
             </div>
           </div>
-          <div v-if="currentWorks.length > 0" class="flex-grow-1 overflow-auto opacity-70">
-            <div class="p-2 mb-2 bg-gray-200 text-center rounded-xl" v-for="work in currentWorks">
-              <p class="text-sm text-blue-600">
-                {{ work.desc || topic?.desc }}
-              </p>
-              <small v-if="work.ended_at" class="text-xs text-blue-300">{{ formatTime(work.began_at) }} to {{
-                formatTime(work.ended_at) }}</small>
+
+          <!-- tomato wall -->
+          <div v-if="currentWorks.length > 0" class="w-1/2 lg:w-1/3 mx-auto text-center pt-25 overflow-auto flex-grow-1 opacity-80">
+            <div class="inline-block w-14 h-14 p-1 mb-2 mr-2 bg-gray-200 rounded-xl" v-for="_ in currentWorks">
+              <img src="../assets/tomato_icon.png" alt="tomato">
             </div>
           </div>
+          <div v-else class="pt-25 text-center text-lg text-gray-400">
+            You haven't grow any tomato today!
+          </div>
+
+
         </div>
         <div v-else class="absolute top-0 left-0  w-full text-center">
-          <div class="mb-10">
-            <Timer @timer:changed="handleTimerStatusChanged" :current-state="timerState" />
+          <div v-if="timerState === 'focus'" class="m-auto w-20 flex items-center justify-center">
+            <span class="h-8 text-3xl mr-2">
+              <Icon class="text-blue-500 i-solar:clock-square-bold-duotone" />
+            </span>
+            <span class="text-gray-300 text-sm">
+              Focusing...
+            </span>
           </div>
+          <div v-if="timerState === 'break'" class="m-auto w-20 flex items-center justify-center">
+            <span class="text-3xl mr-2">
+              <Icon class="text-blue-500 i-solar:cup-hot-bold-duotone" />
+            </span>
+            <span class="text-gray-300 text-sm">
+              Relaxing...
+            </span>
+
+          </div>
+          <div class="mb-10">
+            <Timer @timer:ended="handleFocusEnded" @timer:paused="giveUpWork" :current-state="timerState" />
+          </div>
+          <Button v-if="timerState == 'break'" state="highlight" @click="startWork(true)" class="box-content py-3 px-3 mr-3">
+            <template #icon>
+              <Icon class="mr-2 text-4xl i-solar:refresh-circle-bold-duotone" />
+            </template>
+            <span class="text-sm">
+              Back to work
+            </span>
+          </Button>
           <Button state="danger" @click="giveUpWork" class-name="box-content text-3xl py-3 px-3 mx-auto">
             <template #icon>
               <Icon class-name="text-4xl i-solar:stop-circle-bold-duotone mr-2" />
@@ -201,7 +217,7 @@ onMounted(() => {
         placeholder="enter the description of the work..."></textarea>
     </template>
     <template #footer>
-      <Button @click="startWork" state="default" class-name="text-blue-500 w-1/2 h-8 rounded-sm">
+      <Button :disabled="!dialogState.description" @click="startWork" state="default" class-name="text-blue-500 w-1/2 h-8 rounded-sm">
         Ok
       </Button>
     </template>
