@@ -6,7 +6,7 @@
 
 # Why another pomodoro timer?
 
-Nothing special, just wanna learn Rust by writing an tauri app. At a moment, the idea just came up in my mind.
+Nothing special, just want to learn Rust by writing a tauri app.
 
 # What is the current state of the project?
 Just a toy app. Use on your risk. There may be lots of modifications or re-writings in the future.
