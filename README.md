@@ -1,3 +1,9 @@
+<p align="center">
+  <picture>
+    <img width="300" alt="Tomato Boat" src="src-tauri/icons/icon.png">
+  </picture>
+</p>
+
 # Why another pomodoro timer?
 
 Nothing special, just wanna learn Rust by writing an tauri app. At a moment, the idea just came up in my mind.
