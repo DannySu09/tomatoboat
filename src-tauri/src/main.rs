@@ -17,6 +17,14 @@ fn main() {
         })
         .plugin(tauri_plugin_sql::Builder::default().build())
         .system_tray(menu::set_menus())
+        .on_system_tray_event(|app, event| {
+            match event {
+                tauri::SystemTrayEvent::LeftClick {..} => {
+                    app.show().unwrap();
+                }
+                _ => {}
+            }
+        })
         .invoke_handler(tauri::generate_handler![
             commands::get_uuid,
             commands::block_websites,
