@@ -62,7 +62,8 @@
     ],
     "systemTray": {
       "iconPath": "icons/icon.png",
-      "iconAsTemplate": false
+      "iconAsTemplate": false,
+      "title": "Start a work"
     }
   }
 }

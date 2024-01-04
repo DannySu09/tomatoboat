@@ -17,18 +17,17 @@ const router = useRouter();
 const route = useRoute();
 
 const topicId = route.params.id as string;
-const initialWorkState: NewWork = {
-  began_at: 0,
-  ended_at: 0,
-  desc: '',
-  topic_id: topicId
-};
 
 const topic = ref<Topic>();
 const currentWorks = ref<Work[]>([]);
 const descriptionTextareaRef = ref<HTMLTextAreaElement>();
 
-let workState = reactive<NewWork>(initialWorkState);
+let workState = reactive<NewWork>({
+  began_at: 0,
+  ended_at: 0,
+  desc: '',
+  topic_id: topicId
+});
 const timerState = ref<TimerState>('stopped');
 const dialogState = reactive({
   visible: false,
@@ -65,6 +64,7 @@ function startWork(isContinued = false) {
   } else {
     workState.desc = dialogState.description ?? topic.value?.title ?? '';
   }
+
 
   if (dialogState.visible) {
     dialogState.visible = false;
@@ -122,7 +122,7 @@ onMounted(() => {
       </Button>
       <div class="w-8" v-else />
       <div class="text-center">
-        <h1 class="text-blue-500 text-lg">{{ workState?.desc || topic?.title }}</h1>
+        <h1 class="text-blue-500 text-lg">{{ workState.desc || topic?.title }}</h1>
         <p v-if="timerState !== 'focus' && !workState.desc && topic?.desc" class="text-sm text-pink-700">{{ topic?.desc }}</p>
       </div>
       <div class="w-8" />
@@ -142,7 +142,7 @@ onMounted(() => {
                   Start a work with context
                 </span>
               </Button>
-              <Button @click="startWork" class-name="box-content p-3 ml-3">
+              <Button @click="() => startWork()" class-name="box-content p-3 ml-3">
                 <template #icon>
                   <Icon class-name="i-solar:play-circle-bold-duotone mr-2" />
                 </template>
@@ -184,7 +184,7 @@ onMounted(() => {
           <div class="mb-10">
             <Timer @timer:ended="handleFocusEnded" @timer:paused="giveUpWork" :current-state="timerState" />
           </div>
-          <Button v-if="timerState == 'break'" state="highlight" @click="startWork(true)" class="box-content py-3 px-3 mr-3">
+          <Button v-if="timerState == 'break'" state="highlight" @click="() => startWork(true)" class="box-content py-3 px-3 mr-3">
             <template #icon>
               <Icon class="mr-2 text-4xl i-solar:refresh-circle-bold-duotone" />
             </template>
@@ -219,7 +219,7 @@ onMounted(() => {
         placeholder="enter the description of the work..."></textarea>
     </template>
     <template #footer>
-      <Button :disabled="!dialogState.description" @click="startWork" state="default" class-name="text-blue-500 w-1/2 h-8 rounded-sm">
+      <Button :disabled="!dialogState.description" @click="() => startWork()" state="default" class-name="text-blue-500 w-1/2 h-8 rounded-sm">
         Ok
       </Button>
     </template>
