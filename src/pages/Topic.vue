@@ -60,7 +60,9 @@ function startWork(isContinued = false) {
   timerState.value = 'focus';
   workState.began_at = Date.now();
 
-  if (!isContinued) {
+  if (isContinued) {
+    workState.desc = workState.desc ?? topic.value?.title;
+  } else {
     workState.desc = dialogState.description ?? topic.value?.title ?? '';
   }
 
@@ -121,7 +123,7 @@ onMounted(() => {
       <div class="w-8" v-else />
       <div class="text-center">
         <h1 class="text-blue-500 text-lg">{{ workState?.desc || topic?.title }}</h1>
-        <p v-if="!workState.desc && topic?.desc" class="text-sm text-pink-700">{{ topic?.desc }}</p>
+        <p v-if="timerState !== 'focus' && !workState.desc && topic?.desc" class="text-sm text-pink-700">{{ topic?.desc }}</p>
       </div>
       <div class="w-8" />
     </header>
