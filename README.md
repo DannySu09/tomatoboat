@@ -1,16 +1,24 @@
-# Tauri + Vue 3 + TypeScript
+# Why another pomodoro timer?
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Nothing special, just wanna learn Rust by writing an tauri app. At a moment, the idea just came up in my mind.
 
-## Recommended IDE Setup
+# What is the current state of the project?
+Just a toy app. Use on your risk. There may be lots of modifications or re-writings in the future.
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+# How to develope?
+Firstly, you need to have rust, cargo, node.js and Pnpm installed on your machine.
 
-## Type Support For `.vue` Imports in TS
+Run `cargo install tauri-cli` to install the command line toolkit of Tauri.
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
+Run `pnpm install` under the root directory.
 
-1. Run `Extensions: Show Built-in Extensions` from VS Code's command palette, look for `TypeScript and JavaScript Language Features`, then right click and select `Disable (Workspace)`. By default, Take Over mode will enable itself if the default TypeScript extension is disabled.
-2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
+Run `cargo tauri dev` and start developing.
 
-You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
+Run `cargo tauri build` when you want to build the app.
+> For now, I only configure tauri to build for macOS platform, haven't built or tested on Windows and Linux.
+
+# Problems that don't know how to solve
+Yes, I want to implement a feature just like the awesome [SelfControl](https://github.com/SelfControlApp/selfcontrol) does. When a focus clock was started, the app can block the user from visiting websites in the black list.
+
+But due to the file permission issue, still can't implement it.
+
