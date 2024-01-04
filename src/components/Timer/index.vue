@@ -7,6 +7,7 @@ export type State = 'focus' | 'break' | 'stopped';
 type Events = {
   (e: 'timer:ended'): void;
   (e: 'timer:paused'): void;
+  (e: 'timer:updated', leftTime: number): void;
 }
 
 type ClockEventPayload = {
@@ -71,6 +72,7 @@ async function run() {
     if (payload.start_time !== startTime.value) return;
 
     leftTime.value = payload.left_time;
+    emit("timer:updated", leftTime.value);
   });
 
   await appWindow.listen("clock:stopped", (event) => {

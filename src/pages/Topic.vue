@@ -12,6 +12,7 @@ import routes from '../routes';
 import * as db from '../db/index';
 import type { NewWork, Topic, Work } from '../db/types';
 import { invoke } from '@tauri-apps/api';
+import { notify } from '../utils/notification';
 
 const router = useRouter();
 const route = useRoute();
@@ -100,6 +101,7 @@ async function handleFocusEnded() {
   await db.createWork(workState);
   getCurrentTopicWorks();
   startBreak();
+  notify("You just earn a tomato!", "");
 }
 
 onMounted(() => {
