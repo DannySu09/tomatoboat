@@ -123,7 +123,7 @@ onMounted(() => {
         </template>
       </Button>
       <div class="w-8" v-else />
-      <div class="text-center">
+      <div class="text-center cursor-default">
         <h1 class="text-blue-500 text-lg">{{ workState.desc || topic?.title }}</h1>
         <p v-if="timerState !== 'focus' && !workState.desc && topic?.desc" class="text-sm text-pink-700">{{ topic?.desc }}</p>
       </div>
@@ -159,7 +159,7 @@ onMounted(() => {
               <img src="../assets/tomato_icon.png" alt="tomato">
             </div>
           </div>
-          <div v-else class="pt-25 text-center text-lg text-gray-400">
+          <div v-else class="cursor-default pt-25 text-center text-lg text-gray-400">
             You haven't grown any tomato today!
           </div>
 
