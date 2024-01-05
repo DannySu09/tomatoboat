@@ -45,7 +45,7 @@ async function getTopicDetail() {
 }
 
 async function getCurrentTopicWorks() {
-  const res = await db.getWorks(topicId) as Work[];
+  const res = await db.getWorksOfToday(topicId) as Work[];
   currentWorks.value = res;
 }
 

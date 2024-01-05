@@ -3,6 +3,7 @@ import Database from "tauri-plugin-sql-api";
 import { createTableWork, createTableTopic } from './init';
 import type { NewTopic, NewWork } from "./types";
 import { validateNewTopic } from "../utils/validators";
+import dayjs from "dayjs";
 
 let globalDb: Database;
 
@@ -47,8 +48,9 @@ export async function deleteTopic(topicId: string) {
 }
 
 // event
-export function getWorks(topicId: string) {
-  return globalDb.select("select * from work where topic_id=$1", [topicId]);
+export function getWorksOfToday(topicId: string) {
+  const startTimeOfToday = dayjs().hour(0).minute(0).second(0).valueOf();
+  return globalDb.select("select * from work where topic_id=$1 and began_at >= $2", [topicId, startTimeOfToday]);
 }
 
 export async function createWork(event: NewWork) {
