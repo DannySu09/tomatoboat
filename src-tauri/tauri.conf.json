@@ -55,15 +55,18 @@
     },
     "windows": [
       {
-        "title": "Tomato Boat",
-        "minWidth": 700,
-        "minHeight": 500
+        "minWidth": 560,
+        "minHeight": 300,
+        "width": 660,
+        "height": 400,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "decorations": true
       }
     ],
     "systemTray": {
       "iconPath": "icons/icon.png",
-      "iconAsTemplate": false,
-      "title": "Start a work"
+      "iconAsTemplate": false
     }
   }
 }
