@@ -36,7 +36,7 @@ export default defineConfig({
         800: '#404654'
       },
       pink: {
-        100: '#FEEDED',
+        100: '#FDF9F8',
         200: '#FCEBF5',
         300: '#F9D3E4',
         400: '#EE9AA4',
