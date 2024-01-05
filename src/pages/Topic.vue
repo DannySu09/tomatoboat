@@ -160,7 +160,7 @@ onMounted(() => {
             </div>
           </div>
           <div v-else class="pt-25 text-center text-lg text-gray-400">
-            You haven't grow any tomato today!
+            You haven't grown any tomato today!
           </div>
 
 
